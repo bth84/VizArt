@@ -1,0 +1,79 @@
+</!DOCTYPE html>
+<html>
+<head>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<meta charset="utf-8">
+	<title>BILD D3 Chart</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<script type="text/javascript">
+
+	var data = [
+		{group : "a", v1: 10, v2: 5 },
+		{group : "b", v1: 12, v2: 3 },
+		{group : "c", v1: 12, v2: 6 },
+	];
+
+	var w = 800;
+	var h = 450;
+	var margin = {
+		top: 58,
+		bottom: 100,
+		left: 80,
+		right: 40
+	};
+	var width = w - margin.left - margin.right;
+	var height = h - margin.top - margin.bottom;
+
+	//Die Zeichenfläche selbst
+	var svg = d3.select("body").append("svg")
+				.attr("id", "chart")
+				.attr("width", w)
+				.attr("height", h);
+	
+	//Das eigentliche Chart
+	var chart = svg.append("g")
+				.classed("display", true)
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	//Skalierungsmethode für x-Achse
+	var x = d3.scaleBand()
+			    .rangeRound([0, width])
+			    .paddingInner(0.05)
+			    .align(0.1)
+			    .domain(data.map(function(d) { return d.group; }));
+
+	//Skalierungsmethode für y-Achse
+	var y = d3.scaleLinear()
+    			.rangeRound([height, 0])
+    			.domain([0, d3.max(data, function(d) { return d.v1 + d.v2; })])
+    			.nice(); //Rundet die Achse 'nice'
+
+    //Methode für Farbwahl
+    var z = d3.scaleOrdinal()
+    			.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"])
+    			.domain(data.map(function(d) { return d.group; }));
+
+
+
+	function plot(params){
+
+	}
+
+	plot.call(chart, {
+		data: data,
+
+		/*axis:{
+			x: xAxis,
+			y: yAxis
+		},
+		gridlines: yGridlines,*/
+
+		//Wir wollen, dass nur beim ersten Aufruf die Axen gerendert werden
+		initialize: true
+	});
+</script>
+
+</body>
+</html>
