@@ -9,10 +9,10 @@
 <body>
 <script type="text/javascript">
 
-	var data = [
-		{group : "a", v1: 10, v2: 5 },
-		{group : "b", v1: 12, v2: 3 },
-		{group : "c", v1: 12, v2: 6 },
+	var datas = [
+		{group : "a", v1: 10, v2: 5, total: 15 },
+		{group : "b", v1: 12, v2: 3, total: 15 },
+		{group : "c", v1: 12, v2: 6, total: 18 },
 	];
 
 	var w = 800;
@@ -41,38 +41,67 @@
 	var x = d3.scaleBand()
 			    .rangeRound([0, width])
 			    .paddingInner(0.05)
-			    .align(0.1)
-			    .domain(data.map(function(d) { return d.group; }));
+			    .align(0.1);
+			    //.domain(keys);
 
 	//Skalierungsmethode für y-Achse
 	var y = d3.scaleLinear()
-    			.rangeRound([height, 0])
-    			.domain([0, d3.max(data, function(d) { return d.v1 + d.v2; })])
-    			.nice(); //Rundet die Achse 'nice'
+    			.rangeRound([height, 0]);
+    			//.domain([0, d3.max(data, function(d) { return d.v1 + d.v2; })])
+    			//.nice(); //Rundet die Achse 'nice'
 
     //Methode für Farbwahl
     var z = d3.scaleOrdinal()
-    			.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"])
-    			.domain(data.map(function(d) { return d.group; }));
+    			.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+    			//.domain(keys);
 
 
-
+    //meant to be triggered solely via .call() method
 	function plot(params){
-
+		this.append("g")
+		    .selectAll("g")
+		    .data(d3.stack().keys(keys)(data))
+		    .enter().append("g")
+		      .attr("fill", function(d) { 
+		      	//console.log(d);
+		      	return z(d.key); })
+		    .selectAll("rect")
+		    .data(function(d) { return d; })
+		    .enter().append("rect")
+		      .attr("x", function(d) { return x(d.data.group); })
+		      .attr("y", function(d) { 
+		      	console.log(d);
+		      	return y(d.data.v1+d.data.v2); })
+		      .attr("height", function(d) { return y(d.data.v2) - y(d.data.v1); })
+		      .attr("width", x.bandwidth());
 	}
 
-	plot.call(chart, {
-		data: data,
+	//
+	d3.csv("data2.csv",
+		//row function, wird pro Datenzeile ausgeführt, bevor Daten an die Callback function weitergereicht werden
+		/*function(d, i, columns){
 
-		/*axis:{
-			x: xAxis,
-			y: yAxis
-		},
-		gridlines: yGridlines,*/
+		},*/
 
-		//Wir wollen, dass nur beim ersten Aufruf die Axen gerendert werden
-		initialize: true
+		//Callback function nachdem die Daten eingelesen wurden
+		function(error, data){
+
+			console.log(data);
+
+			/*plot.call(chart, {
+				data: data,
+
+				axis:{
+					x: xAxis,
+					y: yAxis
+				},
+				gridlines: yGridlines,
+
+				//Wir wollen, dass nur beim ersten Aufruf die Axen gerendert werden
+				initialize: true
+			});*/
 	});
+	
 </script>
 
 </body>
